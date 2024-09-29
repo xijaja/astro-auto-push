@@ -1,0 +1,27 @@
+---
+import Layout from '@layouts/Layout.astro';
+import fs from 'node:fs/promises';
+import EditFile from '@components/view/EditFile.vue';
+
+const { fileName } = Astro.params;
+if (!fileName) return Astro.redirect('/404');
+// console.log("fileName:", fileName);
+const allFiles = await Astro.glob("../../content/doc/*.md") || [];  // 文件路径
+// console.log("allFiles:", allFiles);
+const currentFile = allFiles.find((file) => {
+  const filePath = file.file.split("/");
+  const fileName = filePath[filePath.length - 1];
+  return fileName === fileName;
+});
+// console.log("currentFile:", currentFile);
+
+const content = await fs.readFile(currentFile?.file as string, 'utf-8');
+---
+
+<Layout title={`编辑 ${fileName}`}>
+  <h1 class="text-2xl font-bold my-4">编辑 {fileName}</h1>
+
+  <EditFile client:load path={fileName} content={content} />
+
+  <a href="/" class="text-sm text-gray-500">返回首页</a>
+</Layout>
